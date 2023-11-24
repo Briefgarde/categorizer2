@@ -1,4 +1,5 @@
 import 'package:categorizer2/models/issue.dart';
+import 'package:categorizer2/pages/cases_reviewer.dart';
 import 'package:categorizer2/pages/map_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -35,7 +36,12 @@ class LocationDecider extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.push(
+                      context, 
+                      MaterialPageRoute(
+                        builder: (context) => CaseReviewer(issue: issue)
+                      )
+                    );
                   }, 
                   child: const Text("Yes")
                 ),
