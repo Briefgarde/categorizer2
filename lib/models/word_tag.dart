@@ -1,3 +1,5 @@
+import 'package:google_vision/google_vision.dart';
+
 class WordTag {
   final String keyword;
   final double confidence;
@@ -20,4 +22,10 @@ class WordTag {
       _ => throw const FormatException('Failed to load tag.'),
     };
   }
+  // make a toJson method usable by jsonEncode
+  Map<String, dynamic> toJson() => {
+    'keyword': keyword,
+    'confidence': confidence,
+    'topicality': topicality,
+  };
 }

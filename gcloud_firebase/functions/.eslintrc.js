@@ -21,7 +21,11 @@ module.exports = {
       env: {
         mocha: true,
       },
-      rules: {},
+      rules: {
+        "max-len": ["warn", {"code": 120}],
+        "linebreak-style": ["warn", "windows"],
+        "indent": ["error", 4],
+      },
     },
   ],
   globals: {},
