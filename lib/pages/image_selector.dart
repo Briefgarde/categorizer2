@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:categorizer2/models/word_tag.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
@@ -140,12 +139,10 @@ class _ImageSelectorState extends State<ImageSelector>{
     // continue accessing the position of the device.
     Position pos =  await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
-    List<Placemark> placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude); 
-    String address = "${placemarks[0].street}, ${placemarks[0].postalCode} ${placemarks[0].locality}";
     if (mounted){
       setState(() {
         _issue.coordinates = LatLng(pos.latitude, pos.longitude);
-        _issue.address = address;
+        
       });
     }
     return pos;

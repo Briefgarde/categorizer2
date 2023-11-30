@@ -1,5 +1,6 @@
 /* eslint-disable linebreak-style */
 /* eslint-disable require-jsdoc */
+
 function getBoundingBox(baseCoordinate, distanceInMeters) {
   // Radius of the Earth in meters
   const earthRadius = 6371000;

@@ -1,11 +1,9 @@
-import 'package:google_vision/google_vision.dart';
-
 class WordTag {
-  final String keyword;
-  final double confidence;
+  final String description;
+  final double score;
   final double topicality;
 
-  WordTag({required this.keyword, required this.confidence, required this.topicality});
+  WordTag({required this.description, required this.score, required this.topicality});
 
   factory WordTag.fromJson(Map<String, dynamic> json) {
     return switch (json) {
@@ -15,8 +13,8 @@ class WordTag {
         'topicality': double topicality
       } =>
         WordTag(
-          keyword: keyword,
-          confidence: confidence,
+          description: keyword,
+          score: confidence,
           topicality: topicality,
         ),
       _ => throw const FormatException('Failed to load tag.'),
@@ -24,8 +22,8 @@ class WordTag {
   }
   // make a toJson method usable by jsonEncode
   Map<String, dynamic> toJson() => {
-    'keyword': keyword,
-    'confidence': confidence,
+    'description': description,
+    'score': score,
     'topicality': topicality,
   };
 }
