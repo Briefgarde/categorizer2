@@ -60,6 +60,8 @@ exports.getCases = onRequest(async (req, res) => {
 
   const keywords = req.body.keywords.map((obj) => obj.description);
 
+  const casesDateCopy = casesData.slice();
+
   for (let i = 0; i < casesData.length; i++) {
     const currentCase = casesData[i];
     const currentIssues = currentCase.issues;
@@ -68,20 +70,21 @@ exports.getCases = onRequest(async (req, res) => {
       const currentKeywords = currentIssue.keywords.map((obj) => obj.description);
       const similarity = jaccard.index(keywords, currentKeywords);
       if (similarity < 0.2) {
-        casesData.splice(i, 1);
+        // as soon as one of the issue is bad, the whole case is bad
+        casesDateCopy.splice(i, 1);
         break;
       }
     }
   }
 
-  if (casesData.length == 0) {
+  if (casesDateCopy.length == 0) {
     logger.log("All cases eliminated by keywords");
     res.status(204).json({result: "No cases found"});
     return;
   } // second test of the cases, if the keywords still match. if no cases are found, return a 204
-  logger.log(casesData.length + " cases found by keywords");
+  logger.log(casesDateCopy.length + " cases found by keywords");
 
-  res.status(200).json({result: casesData});
+  res.status(200).json({result: casesDateCopy});
   return;
 });
 
