@@ -113,6 +113,11 @@ exports.createCase = onRequest(async (req, res) => {
   }
 });
 
+exports.updateCase = onRequest(async (req, res) => {
+  null;
+  return;
+});
+
 exports.updateCaseCoord = onDocumentUpdated("cases/{caseId}", async (event) => {
   try {
     const newValue = event.data.after.data();

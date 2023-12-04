@@ -86,6 +86,17 @@ class _CaseShowerState extends State<CaseShower> {
               )
             ],
           ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: (){
+                  _createNewCase();
+                }, 
+                child: const Text("None of these cases match mine")
+              )
+            ],
+          ),
           // const Row(
           //   mainAxisAlignment: MainAxisAlignment.center,
           //   children: [
@@ -127,6 +138,10 @@ class _CaseShowerState extends State<CaseShower> {
       );
 
   _addIssueToSelectedCase() {
+    
+  }
+
+  _createNewCase() {
     
   }
 }

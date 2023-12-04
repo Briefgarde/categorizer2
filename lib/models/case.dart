@@ -6,6 +6,7 @@ class Case {
   List<Issue> issues;
   LatLng averageCoordinates;
   int geoHash;
+
   
 
   Case(this.issues, this.averageCoordinates, this.geoHash);
@@ -24,9 +25,8 @@ class Case {
     return Case(issues, LatLng(averageLat, averageLong), geoHash);
   }
 
+
+
   
 }
-
-
-// still need work
-// fromJson method
+// put createMethod here ? 
