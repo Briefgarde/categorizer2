@@ -13,8 +13,8 @@ const {initializeApp} = require("firebase-admin/app");
 const {getFirestore} = require("firebase-admin/firestore");
 
 const geoHandler = require("./geo_handler.js");
+const jaccardSimilarity = require("./jaccard_similarity.js");
 
-const jaccard = require("jaccard");
 const geohash = require("ngeohash");
 
 
@@ -68,7 +68,7 @@ exports.getCases = onRequest(async (req, res) => {
     for (let j = 0; j < currentIssues.length; j++) {
       const currentIssue = currentIssues[j];
       const currentKeywords = currentIssue.keywords.map((obj) => obj.description);
-      const similarity = jaccard.index(keywords, currentKeywords);
+      const similarity = jaccardSimilarity.jaccard(currentKeywords, keywords);
       if (similarity < 0.2) {
         // as soon as one of the issue is bad, the whole case is bad
         casesDateCopy.splice(i, 1);
