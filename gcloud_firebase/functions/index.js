@@ -50,39 +50,38 @@ exports.getCases = onRequest(async (req, res) => {
   const casesQuery = await correctCases.get();
   const casesData = casesQuery.docs.map((doc) => doc.data());
 
-  logger.log(casesData);
+
   if (casesData.length == 0) {
+    logger.log("No cases found");
     res.status(204).json({result: "No cases found"});
     return;
-  }
-  const keywords = req.body.keywords.map((obj) => obj.description);
-  logger.log(keywords);
+  } // first test of the system, after just the geo stuff. if no cases are found, return a 204
+  logger.log(casesData.length + " cases found by geo");
 
-  logger.log("Entering loop");
+  const keywords = req.body.keywords.map((obj) => obj.description);
+
   for (let i = 0; i < casesData.length; i++) {
-    logger.log(i);
     const currentCase = casesData[i];
     const currentIssues = currentCase.issues;
-    logger.log("Entering inner loop");
     for (let j = 0; j < currentIssues.length; j++) {
-      logger.log( " Inner loop :"+ j);
       const currentIssue = currentIssues[j];
       const currentKeywords = currentIssue.keywords.map((obj) => obj.description);
-      logger.log(currentKeywords);
       const similarity = jaccard.index(keywords, currentKeywords);
-      logger.log("Similarity : " + similarity);
       if (similarity < 0.2) {
         casesData.splice(i, 1);
         break;
       }
     }
   }
+
   if (casesData.length == 0) {
+    logger.log("All cases eliminated by keywords");
     res.status(204).json({result: "No cases found"});
     return;
-  }
+  } // second test of the cases, if the keywords still match. if no cases are found, return a 204
+  logger.log(casesData.length + " cases found by keywords");
 
-  res.json({result: casesData});
+  res.status(200).json({result: casesData});
   return;
 });
 

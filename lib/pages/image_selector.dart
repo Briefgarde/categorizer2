@@ -55,10 +55,14 @@ class _ImageSelectorState extends State<ImageSelector>{
                       ],
                     ),
                   ),
+                  
+                    
                   Visibility(
                     visible: _selectedImage != null,
                     maintainState: false,
-                    child: Row(
+                    child: _issue.keywords == null 
+                    ? const CircularProgressIndicator()
+                    : Row(
                       children: [
                         ElevatedButton(
                           onPressed: (){

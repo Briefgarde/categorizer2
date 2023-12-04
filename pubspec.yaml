@@ -45,6 +45,7 @@ dependencies:
   permission_handler: ^11.0.1
   firebase_storage: ^11.5.2
   firebase_core: ^2.23.0
+  carousel_slider: ^4.2.1
 
 dev_dependencies:
   flutter_test:
