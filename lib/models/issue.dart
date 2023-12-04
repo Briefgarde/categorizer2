@@ -29,24 +29,29 @@ class Issue {
 
   Future<void> uploadIssueAsCase() async{
     // upload image to Storage
-    Reference refRoot = FirebaseStorage.instance.ref();
-    Reference refDirImage = refRoot.child('images');
-    Reference refImage = refDirImage.child(DateTime.now().microsecondsSinceEpoch.toString());
-    String urlToImage;
-    try {
-      await refImage.putFile(File(image!.path));
-      // get download URL
-      urlToImage = await refImage.getDownloadURL();
-    } catch (error) {
-      print(error);
-      return;
-    }
+    String urlToImage = await _postImageToBackend();
     // post case to backend
-    await postCase(
+    await _postCase(
         urlToImage, keywords!, coordinates!);
   }
 
-  Future<void> postCase(String urlToImage, List<WordTag> keywords, LatLng coordinates) async {
+  Future<String> _postImageToBackend() async{
+    Reference refRoot = FirebaseStorage.instance.ref();
+    Reference refDirImage = refRoot.child('images');
+    Reference refImage = refDirImage.child(DateTime.now().microsecondsSinceEpoch.toString());
+    try {
+      await refImage.putFile(File(image!.path));
+      // get download URL
+      String urlToImage = await refImage.getDownloadURL();
+      print(urlToImage);
+      return urlToImage;
+    } catch (error) {
+      print(error);
+      return '';
+    }
+  }
+
+  Future<void> _postCase(String urlToImage, List<WordTag> keywords, LatLng coordinates) async {
     final Uri url = Uri.parse(
         'https://us-central1-categorizer-405012.cloudfunctions.net/postCase');
     // call this function by passing the current "issue" as body

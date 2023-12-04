@@ -25,6 +25,17 @@ class Case {
     return Case(issues, LatLng(averageLat, averageLong), geoHash);
   }
 
+  Future<void> updateCaseWithIssue(Issue issue) async {
+    // update the case with the new issue
+    // update the average coordinates
+    // update the geohash
+    // update the keywords
+    // update the image
+    // update the urlToImage
+    // update the issues list
+    // update the case in the backend
+  }
+
 
 
   

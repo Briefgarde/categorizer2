@@ -1,15 +1,21 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:categorizer2/models/case.dart';
+import 'package:categorizer2/models/issue.dart';
+import 'package:categorizer2/models/word_tag.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:http/http.dart' as http;
 
 class CaseShower extends StatefulWidget {
-  const CaseShower({Key? key, required this.cases, required this.image}) : super(key: key);
+  const CaseShower({Key? key, required this.cases, required this.issue}) : super(key: key);
   final List<Case> cases;
-  final File image;
+  final Issue issue;
   @override
   State<CaseShower> createState() => _CaseShowerState();
 }
@@ -17,12 +23,13 @@ class CaseShower extends StatefulWidget {
 class _CaseShowerState extends State<CaseShower> {
   late List<Case> _cases;
   late File _image;
+  late Issue _issue;
 
   @override
   void initState() {
     super.initState();
     _cases = widget.cases;
-    _image = widget.image;
+    _issue = widget.issue;
   }
 
   int _index = 0;
@@ -80,7 +87,7 @@ class _CaseShowerState extends State<CaseShower> {
             children: [
               ElevatedButton(
                 onPressed: (){
-                  _addIssueToSelectedCase();
+                  null;
                 }, 
                 child: const Text("This is my case!")
               )
@@ -97,18 +104,6 @@ class _CaseShowerState extends State<CaseShower> {
               )
             ],
           ),
-          // const Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     Text("Your image for reference")
-          //   ],
-          // ),
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.center,
-          //   children: [
-          //     Image.file(_image)
-          //   ],
-          // ),
         ],
       ),
     );
@@ -117,6 +112,10 @@ class _CaseShowerState extends State<CaseShower> {
   Widget carouselBuilder() {
     List<String> listImage =
         _cases[_index].issues.map((e) => e.urlToImage!).toList();
+    List<String> listKeywords = _cases[_index].issues.map((e) => e.keywords!.map((e) => e.description).join(', ')).toList();
+    for (var words in listKeywords) {
+      print(words);
+    }
     return Expanded(
       child: CarouselSlider.builder(
           itemCount: listImage.length,
@@ -137,11 +136,62 @@ class _CaseShowerState extends State<CaseShower> {
         child: Image.network(urlToImage, fit: BoxFit.cover),
       );
 
-  _addIssueToSelectedCase() {
-    
+  _createNewCase() async {
+    await _issue.uploadIssueAsCase();
+    // after this, we might push to another succes page or something
   }
 
-  _createNewCase() {
-    
+    Future<void> uploadIssueAsCase() async{
+    // upload image to Storage
+    String urlToImage = await _postImageToBackend();
+    // post case to backend
+    await _postCase(
+        urlToImage, widget.issue.keywords!, widget.issue.coordinates!);
+  }
+
+  Future<String> _postImageToBackend() async{
+    Reference refRoot = FirebaseStorage.instance.ref();
+    Reference refDirImage = refRoot.child('images');
+    Reference refImage = refDirImage.child(DateTime.now().microsecondsSinceEpoch.toString());
+    try {
+      await refImage.putFile(File(widget.issue.image!.path));
+      // get download URL
+      String urlToImage = await refImage.getDownloadURL();
+      print(urlToImage);
+      return urlToImage;
+    } catch (error) {
+      print(error);
+      return '';
+    }
+  }
+
+  Future<void> _postCase(String urlToImage, List<WordTag> keywords, LatLng coordinates) async {
+    final Uri url = Uri.parse(
+        'https://us-central1-categorizer-405012.cloudfunctions.net/postCase');
+    // call this function by passing the current "issue" as body
+
+    final Map<String, dynamic> requestBody = {
+      'lat': coordinates.latitude,
+      'long': coordinates.longitude,
+      'keywords': keywords,
+      'urlToImage': urlToImage,
+    };
+
+    final response = await http.post(
+      url,
+      headers: <String, String>{
+        'Content-Type':
+            'application/json', // Set the content type of the request
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      print('Case successfully created');
+    } else {
+      // Request failed, handle the error // probably no cases
+      print('Request failed with status: ${response.statusCode}');
+      print('Error message: ${response.body}');
+    }
   }
 }

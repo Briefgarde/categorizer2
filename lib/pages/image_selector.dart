@@ -203,6 +203,7 @@ class _ImageSelectorState extends State<ImageSelector>{
       Map<String, dynamic> list = jsonDecode(response.body) as Map<String, dynamic>;
       for (var keyword in list['responses'][0]['labelAnnotations']) {
         WordTag wordTag = WordTag.fromJson(keyword);
+        print(wordTag.description);
         wordSet.add(wordTag);
       }
       // Request was successful
