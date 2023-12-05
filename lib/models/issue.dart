@@ -29,21 +29,20 @@ class Issue {
 
   Future<void> uploadIssueAsCase() async{
     // upload image to Storage
-    String urlToImage = await _postImageToBackend();
+    String urlToImage = await postImageToBackend();
     // post case to backend
     await _postCase(
         urlToImage, keywords!, coordinates!);
   }
 
-  Future<String> _postImageToBackend() async{
+  Future<String> postImageToBackend() async{
     Reference refRoot = FirebaseStorage.instance.ref();
     Reference refDirImage = refRoot.child('images');
     Reference refImage = refDirImage.child(DateTime.now().microsecondsSinceEpoch.toString());
     try {
-      await refImage.putFile(File(image!.path));
-      // get download URL
+      final UploadTask uploadTask = refImage.putFile(File(image!.path));
+      await uploadTask.whenComplete(() => null);
       String urlToImage = await refImage.getDownloadURL();
-      print(urlToImage);
       return urlToImage;
     } catch (error) {
       print(error);
@@ -53,7 +52,7 @@ class Issue {
 
   Future<void> _postCase(String urlToImage, List<WordTag> keywords, LatLng coordinates) async {
     final Uri url = Uri.parse(
-        'https://us-central1-categorizer-405012.cloudfunctions.net/postCase');
+        'https://us-central1-categorizer-405012.cloudfunctions.net/createCase');
     // call this function by passing the current "issue" as body
 
     final Map<String, dynamic> requestBody = {

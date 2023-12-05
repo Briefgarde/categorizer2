@@ -1,3 +1,4 @@
+/* eslint-disable linebreak-style */
 /* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 
@@ -10,13 +11,12 @@ const {
 
 // The Firebase Admin SDK to access Firestore.
 const {initializeApp} = require("firebase-admin/app");
-const {getFirestore} = require("firebase-admin/firestore");
+const {getFirestore, FieldValue} = require("firebase-admin/firestore");
 
 const geoHandler = require("./geo_handler.js");
 const jaccardSimilarity = require("./jaccard_similarity.js");
 
 const geohash = require("ngeohash");
-
 
 initializeApp();
 
@@ -31,6 +31,7 @@ const db = getFirestore();
 */ /* ----------------------------------------------------------*/
 
 exports.getCases = onRequest(async (req, res) => {
+  logger.log("GET CASES activated at : " + Date.now.toString());
   const lat = req.body.lat;
   const long = req.body.long;
   const boundingBox =
@@ -48,7 +49,10 @@ exports.getCases = onRequest(async (req, res) => {
       .where("coordHash", "<=", geoHashMax);
 
   const casesQuery = await correctCases.get();
-  const casesData = casesQuery.docs.map((doc) => doc.data());
+  const casesData = casesQuery.docs.map((doc) => ({
+    ...doc.data(),
+    id: doc.id,
+  }));
 
 
   if (casesData.length == 0) {
@@ -98,6 +102,7 @@ exports.createCase = onRequest(async (req, res) => {
           coordHash: geohash.encode_int(body.lat, body.long),
           averageLat: body.lat,
           averageLong: body.long,
+          id: "",
           issues: [
             {
               lat: body.lat,
@@ -117,8 +122,26 @@ exports.createCase = onRequest(async (req, res) => {
 });
 
 exports.updateCase = onRequest(async (req, res) => {
-  null;
-  return;
+  if (req.method != "POST") {
+    res.status(405).json({result: "Send a POST call"});
+    return;
+  }
+
+  const body = req.body;
+  const docID = body.docID;
+
+  const newData = {
+    "keywords": body.keywords,
+    "lat": body.lat,
+    "long": body.long,
+    "urlToImage": body.urlToImage,
+  };
+
+  // done like this, this should ADD the issue, instead of deleting overwriting the current Issues.
+  const updateRes = await db.collection("cases").doc(docID).update({
+    issues: FieldValue.arrayUnion(newData),
+  });
+  return res.status(200).json({result: "Case updated !"});
 });
 
 exports.updateCaseCoord = onDocumentUpdated("cases/{caseId}", async (event) => {
