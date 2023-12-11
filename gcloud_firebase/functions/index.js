@@ -59,25 +59,31 @@ exports.getCases = onRequest(async (req, res) => {
     logger.log("No cases found");
     res.status(204).json({result: "No cases found"});
     return;
-  } // first test of the system, after just the geo stuff. if no cases are found, return a 204
+  } // first test of the system, after just the geo stuff. if no cases are found, return a 204 : no content
   logger.log(casesData.length + " cases found by geo");
 
   const keywords = req.body.keywords.map((obj) => obj.description);
+  logger.log("main Keywords : " + keywords);
 
   const casesDateCopy = casesData.slice();
 
-  for (let i = 0; i < casesData.length; i++) {
+  for (let i = casesData.length - 1; i >= 0; i--) { // iterate backwards to avoid index out of bound in the copy
     const currentCase = casesData[i];
     const currentIssues = currentCase.issues;
     for (let j = 0; j < currentIssues.length; j++) {
       const currentIssue = currentIssues[j];
       const currentKeywords = currentIssue.keywords.map((obj) => obj.description);
+      logger.log("Current keywords at i:" +i +" /j:" + j + " " + currentKeywords);
       const similarity = jaccardSimilarity.jaccard(currentKeywords, keywords);
+      logger.log("Similarity : " + similarity);
       if (similarity < 0.2) {
         // as soon as one of the issue is bad, the whole case is bad
+        logger.log("Case eliminated by keywords");
         casesDateCopy.splice(i, 1);
         break;
       }
+      logger.log("Case kept by keywords"); // this doesn't go through unless the case is kept
+      // because we break out of the inside loop
     }
   }
 
