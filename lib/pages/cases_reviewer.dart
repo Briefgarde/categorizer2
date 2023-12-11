@@ -62,7 +62,32 @@ class _CaseReviewerState extends State<CaseReviewer> {
   }
 
   Widget _noCaseFound() {
-    return const Text("Your case has been analyzed but no similar cases were found, so we created a new one !");
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            const Text(
+              "Your case has been analyzed but no similar cases were found, so we created a new one !", 
+              textAlign: TextAlign.center,
+            ),
+            const Text(
+              "You should go back to the start and try again with a different picture or a different localisation.", 
+              textAlign: TextAlign.center,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+              }, 
+              child: const Text("Go back")
+            ),
+          ],
+        ),
+      ),
+    );
+    
+    
+    //return const Text("Your case has been analyzed but no similar cases were found, so we created a new one !");
   }
 
   Future<List<Case>> getGoodCases() async {

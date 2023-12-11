@@ -183,7 +183,7 @@ class _ImageSelectorState extends State<ImageSelector>{
         {
           "image": {"content": sendData},
           "features": [
-            {"type": "LABEL_DETECTION", "maxResults": 10}
+            {"type": "LABEL_DETECTION", "maxResults": 20}
           ]
         }
       ]

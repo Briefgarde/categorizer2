@@ -24,10 +24,12 @@ class _MapScreenState extends State<MapScreen> {
         options: MapOptions(
           initialCenter: widget.issue.coordinates!,
           onTap: (tapPosition, point) => {
+              print("lat : ${point.latitude} long : ${point.longitude}"),
               setState(() {
                 markerCoord = point;
+                widget.issue.coordinates = point;
               }),
-              widget.issue.coordinates = point
+              
             },
         ),
         children: [

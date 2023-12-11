@@ -5,6 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:latlong2/latlong.dart';
 import 'word_tag.dart';
 import 'package:http/http.dart' as http;
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Issue {
   File? image;
@@ -24,15 +26,23 @@ class Issue {
       keywords.add(WordTag.fromJson(keyword));
     } // in the fromJson method, the Issue doesn't have a File image, but only an URL
     // when originally created, the Issue has a File image, but no URL
+
     return Issue(null, keywords, LatLng(lat, long), image);
   }
 
-  Future<void> uploadIssueAsCase() async{
+  Future<String?> getAdressFromCoordinates() async {
+    List<Placemark> placemarks = await placemarkFromCoordinates(
+        coordinates!.latitude, coordinates!.longitude);
+    return '${placemarks[0].street}, ${placemarks[0].postalCode} ${placemarks[0].locality}';
+  }
+
+  Future<bool> uploadIssueAsCase() async{
     // upload image to Storage
     String urlToImage = await postImageToBackend();
     // post case to backend
-    await _postCase(
+    bool worked = await _postCase(
         urlToImage, keywords!, coordinates!);
+    return worked;
   }
 
   Future<String> postImageToBackend() async{
@@ -50,7 +60,7 @@ class Issue {
     }
   }
 
-  Future<void> _postCase(String urlToImage, List<WordTag> keywords, LatLng coordinates) async {
+  Future<bool> _postCase(String urlToImage, List<WordTag> keywords, LatLng coordinates) async {
     final Uri url = Uri.parse(
         'https://us-central1-categorizer-405012.cloudfunctions.net/createCase');
     // call this function by passing the current "issue" as body
@@ -72,11 +82,14 @@ class Issue {
     );
 
     if (response.statusCode == 200) {
+      
       print('Case successfully created');
+      return true;
     } else {
       // Request failed, handle the error // probably no cases
       print('Request failed with status: ${response.statusCode}');
       print('Error message: ${response.body}');
+      return false;
     }
   }
 

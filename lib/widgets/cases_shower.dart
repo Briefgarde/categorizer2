@@ -1,19 +1,13 @@
-// ignore_for_file: prefer_const_constructors
-
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:categorizer2/models/case.dart';
 import 'package:categorizer2/models/issue.dart';
-import 'package:categorizer2/models/word_tag.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:categorizer2/pages/result.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:http/http.dart' as http;
 
 class CaseShower extends StatefulWidget {
-  const CaseShower({Key? key, required this.cases, required this.issue}) : super(key: key);
+  const CaseShower({Key? key, required this.cases, required this.issue})
+      : super(key: key);
   final List<Case> cases;
   final Issue issue;
   @override
@@ -46,14 +40,16 @@ class _CaseShowerState extends State<CaseShower> {
           const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(child: Text("Some cases may have more than one picture, be sure to check them all !"))
+              Expanded(
+                  child: Text(
+                      "Some cases may have more than one picture, be sure to check them all !"))
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text("Case ${_index + 1}"),
-              Text(" of "), // we do +1 because otherwise it starts at 0
+              const Text(" of "), // we do +1 because otherwise it starts at 0
               Text((_cases.length).toString()),
             ],
           ),
@@ -64,8 +60,8 @@ class _CaseShowerState extends State<CaseShower> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
+                ElevatedButton(
+                  child: const Text("Previous case"),
                   onPressed: () {
                     setState(() {
                       if (_index > 0) {
@@ -74,8 +70,8 @@ class _CaseShowerState extends State<CaseShower> {
                     });
                   },
                 ),
-                IconButton(
-                  icon: Icon(Icons.arrow_forward_ios),
+                ElevatedButton(
+                  child: const Text("Next case"),
                   onPressed: () {
                     setState(() {
                       if (_index < _cases.length - 1) {
@@ -91,22 +87,20 @@ class _CaseShowerState extends State<CaseShower> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: (){
-                  _updateCase();
-                }, 
-                child: const Text("This is my case!")
-              )
+                  onPressed: () {
+                    _updateCase();
+                  },
+                  child: const Text("This is my case!"))
             ],
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ElevatedButton(
-                onPressed: (){
-                  _createNewCase();
-                }, 
-                child: const Text("None of these cases match mine")
-              )
+                  onPressed: () {
+                    _createNewCase();
+                  },
+                  child: const Text("None of these cases match mine"))
             ],
           ),
         ],
@@ -117,37 +111,73 @@ class _CaseShowerState extends State<CaseShower> {
   Widget carouselBuilder() {
     List<String> listImage =
         _cases[_index].issues.map((e) => e.urlToImage!).toList();
-    List<String> listKeywords = _cases[_index].issues.map((e) => e.keywords!.map((e) => e.description).join(', ')).toList();
+    List<String> listKeywords = _cases[_index]
+        .issues
+        .map((e) => e.keywords!.map((e) => e.description).join(', '))
+        .toList();
     for (var words in listKeywords) {
       print(words);
     }
     return Expanded(
-      child: CarouselSlider.builder(
-          itemCount: listImage.length,
-          itemBuilder: (context, index, realIndex) {
-            final imageURL = listImage[index];
-            return buildImage(imageURL, index);
-          },
-          options: CarouselOptions(
-            height: 400,
-            enableInfiniteScroll: false,
-          )),
+      child: Column(
+        children: [
+          CarouselSlider.builder(
+              itemCount: listImage.length,
+              itemBuilder: (context, index, realIndex) {
+                final imageURL = listImage[index];
+                return buildImage(imageURL, index);
+              },
+              options: CarouselOptions(
+                height: 400,
+                enableInfiniteScroll: false,
+              )),
+              FutureBuilder(
+                future: _cases[_index].issues[0].getAdressFromCoordinates(), 
+                builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data!);
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  }
+                  else {
+                    return const CircularProgressIndicator();
+                  }
+                }
+              ),
+        ],
+      ),
     );
   }
 
   Widget buildImage(String urlToImage, int index) => Container(
-        margin: EdgeInsets.symmetric(horizontal: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 12),
         color: Colors.grey,
-        child: Image.network(urlToImage, fit: BoxFit.cover),
+        child: Image.network(urlToImage, fit: BoxFit.contain),
+
       );
 
   _createNewCase() async {
-    await _issue.uploadIssueAsCase();
+    bool worked = await _issue.uploadIssueAsCase();
+    print("result of create case: $worked");
     // after this, we might push to another succes page or something
+    if (worked) {
+      _goToResult();
+    }
   }
 
   _updateCase() async {
     bool worked = await _cases[_index].updateCaseWithIssue(_issue);
-    print(worked);
+    print("result of update case: $worked");
+    if (worked) {
+      _goToResult();
+    }
+    
+  }
+
+  _goToResult() {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(builder: (context) => const ResultPage())
+    );
   }
 }
