@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -18,96 +17,104 @@ class ImageSelector extends StatefulWidget {
   State<ImageSelector> createState() => _ImageSelectorState();
 }
 
-class _ImageSelectorState extends State<ImageSelector>{
+class _ImageSelectorState extends State<ImageSelector> {
+  late Future<Position> pos;
+  @override
+  void initState() {
+    super.initState();
+    pos = _determinePosition();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Select an image"),
-      ),
-      body: FutureBuilder<Position>(
-        future: _determinePosition(), 
-        builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
-          if (snapshot.hasData) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (_issue.image != null)
-                    Image.file(_issue.image!),
-                  Visibility(
-                    visible: _selectedImage == null,
-                    maintainState: false,
-                    child: Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            _takePic(false);
-                          }, 
-                          child: const Text("Choose picture from gallery")
+        appBar: AppBar(
+          title: const Text("Select an image"),
+        ),
+        body: FutureBuilder<Position>(
+            future: pos,
+            builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+              if (snapshot.hasData) {
+                return Center(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                      if (_issue.image != null)
+                        Expanded(
+                          child: Image.file(_issue.image!, fit: BoxFit.cover),
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            _takePic(true);
-                          },  
-                          child: const Text("Take a picture")
-                        )
-                      ],
-                    ),
-                  ),
-                  
-                    
-                  Visibility(
-                    visible: _selectedImage != null,
-                    maintainState: false,
-                    child: _issue.keywords == null 
-                    ? const CircularProgressIndicator()
-                    : Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: (){
-                            Navigator.push(
-                              context, 
-                              MaterialPageRoute(
-                                builder: (context) => LocationDecider(issue: _issue)
-                              )
-                            );                         
-                          }, 
-                          child: const Text("Choose this picture")
+                      Visibility(
+                        visible: _selectedImage == null,
+                        maintainState: false,
+                        child: Row(
+                          children: [
+                            ElevatedButton(
+                                onPressed: () {
+                                  _takePic(false);
+                                },
+                                child:
+                                    const Text("Choose picture from gallery")),
+                            ElevatedButton(
+                                onPressed: () {
+                                  _takePic(true);
+                                },
+                                child: const Text("Take a picture"))
+                          ],
                         ),
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _selectedImage = null;
-                            });
-                          }, 
-                          child: const Text("Choose another picture")
-                        )
-                      ],
-                    )
-                  ),
-                ]
-              )
-            );
-          } else {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CircularProgressIndicator()
-                ]
-              )
-            );
-          }
-        }
-      )
-    );
+                      ),
+                      Visibility(
+                          visible: _selectedImage != null,
+                          maintainState: false,
+                          child: _issue.keywords == null
+                              ? const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    Text('Loading keywords...'),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LocationDecider(
+                                                          issue: _issue)));
+                                        },
+                                        child:
+                                            const Text("Choose this picture")),
+                                    ElevatedButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _selectedImage = null;
+                                          });
+                                        },
+                                        child: const Text(
+                                            "Choose another picture"))
+                                  ],
+                                )),
+                    ]));
+              } else {
+                return const Center(
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                      CircularProgressIndicator(),
+                      Text(
+                          "We're trying to get your location, please wait a moment...")
+                    ]));
+              }
+            }));
   }
 
   File? _selectedImage;
   final Issue _issue = Issue(null, null, null, null);
 
   Future<Position> _determinePosition() async {
+    
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -141,33 +148,30 @@ class _ImageSelectorState extends State<ImageSelector>{
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    Position pos =  await Geolocator.getCurrentPosition(
+    Position pos = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best);
-    if (mounted){
-      setState(() {
-        _issue.coordinates = LatLng(pos.latitude, pos.longitude);
-        
-      });
-    }
+    setState(() {
+      _issue.coordinates = LatLng(pos.latitude, pos.longitude);
+    });
     return pos;
   }
 
   Future _takePic(bool useCamera) async {
-    final returnImage =
-        await ImagePicker().pickImage(source: useCamera == true ? ImageSource.camera : ImageSource.gallery);
+    final returnImage = await ImagePicker().pickImage(
+        source: useCamera ? ImageSource.camera : ImageSource.gallery);
 
     if (returnImage == null) {
       return;
     } else {
-      if (mounted){
+      if (mounted) {
         setState(() {
           _selectedImage = File(returnImage.path);
         });
       }
     }
-    _makeCall();
+    await _makeCall();
   }
-  
+
   _makeCall() async {
     String? sendData;
     if (_selectedImage != null) {
@@ -200,7 +204,8 @@ class _ImageSelectorState extends State<ImageSelector>{
 
     if (response.statusCode == 200) {
       List<WordTag> wordSet = [];
-      Map<String, dynamic> list = jsonDecode(response.body) as Map<String, dynamic>;
+      Map<String, dynamic> list =
+          jsonDecode(response.body) as Map<String, dynamic>;
       for (var keyword in list['responses'][0]['labelAnnotations']) {
         WordTag wordTag = WordTag.fromJson(keyword);
         wordSet.add(wordTag);
