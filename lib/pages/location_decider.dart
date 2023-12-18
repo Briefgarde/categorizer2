@@ -19,9 +19,10 @@ class LocationDecider extends StatelessWidget {
           child: Column(
             children: [
               const Text("Here is the picture you took"),
-              Image.file(issue.image!),
+              Expanded(child: Image.file(issue.image!),),
               const Text("To help us categorize your issue, we need to know where it is."),
               const Text("Are you currently where you took the picture ?"),
+              const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [

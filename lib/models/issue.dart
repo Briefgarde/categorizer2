@@ -6,7 +6,6 @@ import 'package:latlong2/latlong.dart';
 import 'word_tag.dart';
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 
 class Issue {
   File? image;
@@ -29,6 +28,8 @@ class Issue {
 
     return Issue(null, keywords, LatLng(lat, long), image);
   }
+
+
 
   Future<String?> getAdressFromCoordinates() async {
     List<Placemark> placemarks = await placemarkFromCoordinates(

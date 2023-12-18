@@ -26,6 +26,9 @@ class ResultPage extends StatelessWidget {
               const Text("Maybe yours will be part of the results this time !"),
               ElevatedButton(
                 onPressed: () {
+                  //reset the issue to nothing 
+                  
+                  //go back to the start of the POC
                   Navigator.popUntil(context, (route) => route.isFirst);
                 },
                 child: const Text("Go back")

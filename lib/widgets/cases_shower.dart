@@ -3,8 +3,6 @@ import 'package:categorizer2/models/issue.dart';
 import 'package:categorizer2/pages/result.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:http/http.dart' as http;
-
 class CaseShower extends StatefulWidget {
   const CaseShower({Key? key, required this.cases, required this.issue})
       : super(key: key);
@@ -89,6 +87,7 @@ class _CaseShowerState extends State<CaseShower> {
               ElevatedButton(
                   onPressed: () {
                     _updateCase();
+                    
                   },
                   child: const Text("This is my case!"))
             ],
@@ -99,6 +98,7 @@ class _CaseShowerState extends State<CaseShower> {
               ElevatedButton(
                   onPressed: () {
                     _createNewCase();
+                    
                   },
                   child: const Text("None of these cases match mine"))
             ],
