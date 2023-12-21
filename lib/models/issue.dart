@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:categorizer2/models/case.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'word_tag.dart';
 import 'package:http/http.dart' as http;
@@ -35,6 +36,29 @@ class Issue {
     List<Placemark> placemarks = await placemarkFromCoordinates(
         coordinates!.latitude, coordinates!.longitude);
     return '${placemarks[0].street}, ${placemarks[0].postalCode} ${placemarks[0].locality}';
+  }
+
+  /// Returns a [Widget] that displays the address of an issue.
+  ///
+  /// The [style] parameter allows you to specify the text style of the address.
+  /// If not provided, the default text style is used.
+  ///
+  /// The [before] and [after] parameters allow you to specify text to display
+  /// before and after the address. If not provided, no extra text is displayed.
+  Widget getAddress({TextStyle? style, String? before, String? after}){
+    before ??= "";
+    after ??= "";
+    return FutureBuilder(
+      future: getAdressFromCoordinates(), 
+      builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+        if (snapshot.hasData) {
+          return Text("$before ${snapshot.data!} $after", style: style);
+        }
+        else {
+          return const SizedBox.shrink();
+        }
+      }
+    );
   }
 
   Future<bool> uploadIssueAsCase() async{

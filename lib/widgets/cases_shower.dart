@@ -56,7 +56,8 @@ class _CaseShowerState extends State<CaseShower> {
             maintainState: false,
             // those are buttons to switch between CASES, not pictures in the carousel, which represent ISSUES in ONE CASE
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
               children: [
                 ElevatedButton(
                   child: const Text("Previous case"),

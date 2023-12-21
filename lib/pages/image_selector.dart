@@ -44,24 +44,41 @@ class _ImageSelectorState extends State<ImageSelector> {
                           child: Image.file(_issue.image!, fit: BoxFit.cover),
                         ),
                       Visibility(
-                        visible: _selectedImage == null,
-                        maintainState: false,
-                        child: Row(
-                          children: [
-                            ElevatedButton(
-                                onPressed: () {
-                                  _takePic(false);
-                                },
-                                child:
-                                    const Text("Choose picture from gallery")),
-                            ElevatedButton(
-                                onPressed: () {
-                                  _takePic(true);
-                                },
-                                child: const Text("Take a picture"))
-                          ],
-                        ),
-                      ),
+                          visible: _selectedImage == null,
+                          maintainState: false,
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Expanded(child: _issue.getAddress(before: "Your current position :"))
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        _takePic(false);
+                                      },
+                                      child: const Text(
+                                          "Choose picture from gallery")),
+                                  ElevatedButton(
+                                      onPressed: () {
+                                        _takePic(true);
+                                      },
+                                      child: const Text("Take a picture"))
+                                ],
+                              ),
+                            ],
+                          )),
+                      // let's be very clear :
+                      // this is positively an *horrible* way of handling the situation.
+                      // I did this right when starting with Flutter, and now, I cringe just looking at this.
+                      // Because it is just a POC, I am not going to refactor anything
+                      // but I agree that this is crap.
                       Visibility(
                           visible: _selectedImage != null,
                           maintainState: false,
@@ -73,27 +90,48 @@ class _ImageSelectorState extends State<ImageSelector> {
                                     Text('Loading keywords...'),
                                   ],
                                 )
-                              : Row(
+                              : Column(
                                   children: [
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      LocationDecider(
-                                                          issue: _issue)));
-                                        },
-                                        child:
-                                            const Text("Choose this picture")),
-                                    ElevatedButton(
-                                        onPressed: () {
-                                          setState(() {
-                                            _selectedImage = null;
-                                          });
-                                        },
-                                        child: const Text(
-                                            "Choose another picture"))
+                                    Padding(
+                                        padding: const EdgeInsets.all(10.0),
+                                        child: Column(
+                                          children: [
+                                            _issue.getAddress(),
+                                            Text(
+                                              'Keywords: ${_issue.keywords!.map((e) => e.description).join(', ')}',
+                                              style: const TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        )),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          LocationDecider(
+                                                              issue: _issue)));
+                                            },
+                                            child: const Text(
+                                                "Choose this picture")),
+                                        ElevatedButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                _issue.image = null;
+                                                _selectedImage = null;
+                                              });
+                                            },
+                                            child: const Text(
+                                                "Choose another picture"))
+                                      ],
+                                    )
                                   ],
                                 )),
                     ]));
@@ -114,7 +152,6 @@ class _ImageSelectorState extends State<ImageSelector> {
   final Issue _issue = Issue(null, null, null, null);
 
   Future<Position> _determinePosition() async {
-    
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -179,6 +216,11 @@ class _ImageSelectorState extends State<ImageSelector> {
       sendData = base64.encode(imgbytes);
     }
 
+    // I fully know that putting the API Key in full in the code is not good practice
+    // and can lead to security issue, or having my key stolen.
+    // For the record, this key is only allowed to call the vision API
+    // which heavily limit the power it has. 
+    // While having the key like this isn't optimal, it is acceptable for the POC. 
     final url = Uri.parse(
         "https://vision.googleapis.com/v1/images:annotate?key=AIzaSyC02yw_zH30GZxEUdcSdg9CADODSGyWTuw");
 

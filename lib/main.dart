@@ -20,10 +20,19 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Categorizer (2)',
+      title: 'Categorizer 2',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 236, 0, 0)),
-        useMaterial3: true,
+        appBarTheme: const AppBarTheme(
+          color: Color.fromARGB(255, 236, 0, 0)
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(const Color.fromARGB(255, 236, 0, 0)),
+            foregroundColor: MaterialStateProperty.all(Colors.white),
+            padding: MaterialStateProperty.all(const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
+          ),
+        ),
+        // Add other theme properties here
       ),
       home: const IntroPage(),
     );
