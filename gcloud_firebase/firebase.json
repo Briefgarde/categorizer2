@@ -22,5 +22,8 @@
     "firestore": {
       "port": 30000
     }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
