@@ -15,6 +15,7 @@ const {getFirestore, FieldValue} = require("firebase-admin/firestore");
 
 const geoHandler = require("./geo_handler.js");
 const jaccardSimilarity = require("./jaccard_similarity.js");
+const cosineSimilarity = require("./cosine_similarity.js");
 
 const geohash = require("ngeohash");
 
@@ -74,9 +75,11 @@ exports.getCases = onRequest(async (req, res) => {
       const currentIssue = currentIssues[j];
       const currentKeywords = currentIssue.keywords.map((obj) => obj.description);
       logger.log("Current keywords at i:" +i +" /j:" + j + " " + currentKeywords);
-      const similarity = jaccardSimilarity.jaccard(currentKeywords, keywords);
-      logger.log("Similarity : " + similarity);
-      if (similarity < 0.2) {
+      const jacSimilarity = jaccardSimilarity.jaccard(currentKeywords, keywords);
+      logger.log("Similarity : " + jacSimilarity);
+      const cosSimilarity = cosineSimilarity.cosine(currentKeywords, keywords);
+      logger.log("Similarity : " + cosSimilarity);
+      if (cosSimilarity < 0.4) {
         // as soon as one of the issue is bad, the whole case is bad
         logger.log("Case eliminated by keywords");
         casesDateCopy.splice(i, 1);

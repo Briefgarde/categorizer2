@@ -18,7 +18,8 @@
     "firebase-functions": "^4.3.1",
     "jaccard": "^0.4.0",
     "nanoid": "^5.0.3",
-    "ngeohash": "^0.6.3"
+    "ngeohash": "^0.6.3",
+    "string-similarity-js": "^2.1.4"
   },
   "devDependencies": {
     "eslint": "^8.15.0",

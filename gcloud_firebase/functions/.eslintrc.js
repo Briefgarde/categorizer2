@@ -23,7 +23,7 @@ module.exports = {
       },
       rules: {
         "max-len": ["warn", {"code": 120}],
-        "linebreak-style": ["warn", "windows"],
+        "linebreak-style": "off",
         "indent": ["error", 4],
       },
     },
