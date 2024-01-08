@@ -31,4 +31,7 @@ We recommend you do **NOT** try to run this project while connecting it to a dif
 - - Then run `firebase login` from the project's root to connect your Google Account to the project. The Firebase instance should be called "categorizer". 
 - If this ran successfully and you're connected, you should now be able to run the app from the main.dart file.
 
+## Contact
+If, by any misfortune, the project can not run on your machine due to some unforseen circumstances, please contact me (briefgarde@gmail.com) to try and resolve the issue. The project runs as an .apk on my phone just fine, I have no reason to believe it's a case of "well it runs on my machine" if a problem happens. 
+
  
