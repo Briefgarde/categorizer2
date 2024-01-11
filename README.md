@@ -4,7 +4,11 @@
 
 # Categorizer
 
-Categorizer is intented to be an add-on to CityMobis to help the app better handle the cases and issues submitted by its users. Categorizer uses Image Tagging with Google Vision to add keywords to an image, then uses those keywords to compare the similarity of a potential new case to avoid potentially duplicating into two separates issues a problem that is, in real life, the same. 
+Categorizer is intented to be an add-on to CityMobis to help the app better handle the cases and issues submitted by its users. Categorizer uses Image Tagging with Google Vision to add keywords to an image, then uses those keywords to compare the similarity of a potential new case to avoid potentially duplicating into two separates issues a problem that is, in real life, the same.
+
+## Video demo : 
+
+https://www.youtube.com/watch?v=w37hRG4S7EQ
 
 ## Techno used 
 - Frontend :
@@ -27,11 +31,13 @@ We recommend you do **NOT** try to run this project while connecting it to a dif
 - Clone the repo
 - Run `flutter pub get` at the root of the project. 
 - You should now be able to run the app on an emulator / as an .apk. 
+
+If you'd like to modify the backend, continue following those steps : 
 - Run `npm install` in the `/gcloud_firebase` folder. It might be needed to run this again at `/gcloud_firebase/functions`. For safety, do so as well. 
 - - Then run `firebase login` from the project's root to connect your Google Account to the project. The Firebase instance should be called "categorizer". 
 - If this ran successfully and you're connected, you should now be able to run the app from the main.dart file.
 
 ## Contact
-If, by any misfortune, the project can not run on your machine due to some unforseen circumstances, please contact me (briefgarde@gmail.com) to try and resolve the issue. The project runs as an .apk on my phone just fine, I have no reason to believe it's a case of "well it runs on my machine" if a problem happens. 
+If the project can not run on your machine, please contact me (briefgarde@gmail.com) to try and resolve the issue. The project runs as an .apk on my phone just fine, I have no reason to believe it's a case of "well it runs on my machine" if a problem happens. 
 
  
