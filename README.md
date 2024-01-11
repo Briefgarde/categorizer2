@@ -8,7 +8,8 @@ Categorizer is intented to be an add-on to CityMobis to help the app better hand
 
 ## Video demo : 
 
-https://www.youtube.com/watch?v=w37hRG4S7EQ
+[![Video Preview](https://img.youtube.com/vi/w37hRG4S7EQ/0.jpg)](https://www.youtube.com/watch?v=w37hRG4S7EQ)
+
 
 ## Techno used 
 - Frontend :
